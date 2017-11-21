@@ -5,14 +5,14 @@ namespace NeuralNetwork_CSharp
     public class Layer
     {
         private static readonly Random Random = new Random();
-        private const float LEARNING_RATE = 0.1f;
+        private const double LEARNING_RATE = 0.1f;
 
         private readonly int _numberOfInputs;
         private readonly int _numberOfOutputs;
-        private readonly Func<float, float> _activationFunction;
-        private readonly float[] _outputs;
-        private float[] _inputs;
-        public readonly float[,] Weights;
+        private readonly Func<double, double> _activationFunction;
+        private readonly double[] _outputs;
+        private double[] _inputs;
+        public readonly double[,] Weights;
 
         /// <summary>
         /// Creates a Layer with the amount of provided inputs and outputs.
@@ -20,12 +20,12 @@ namespace NeuralNetwork_CSharp
         /// <param name="numberOfInputs"></param>
         /// <param name="numberOfOutputs"></param>
         /// <param name="activationFunction"></param>
-        public Layer(int numberOfInputs, int numberOfOutputs, Func<float, float> activationFunction)
+        public Layer(int numberOfInputs, int numberOfOutputs, Func<double, double> activationFunction)
         {
             _numberOfInputs = numberOfInputs;
             _numberOfOutputs = numberOfOutputs;
-            _outputs = new float[numberOfOutputs];
-            _inputs = new float[numberOfInputs];
+            _outputs = new double[numberOfOutputs];
+            _inputs = new double[numberOfInputs];
             Weights = CreateWeights(numberOfOutputs, numberOfInputs);
             _activationFunction = activationFunction;
         }
@@ -36,12 +36,12 @@ namespace NeuralNetwork_CSharp
         /// <param name="numberOfOuputs">Amount of Outputs</param>
         /// <param name="numberOfInputs">Amount of Inputs</param>
         /// <returns></returns>
-        private static float[,] CreateWeights(int numberOfOuputs, int numberOfInputs)
+        private static double[,] CreateWeights(int numberOfOuputs, int numberOfInputs)
         {
-            float[,] weights = new float[numberOfOuputs, numberOfInputs];
+            double[,] weights = new double[numberOfOuputs, numberOfInputs];
             for (int i = 0; i < numberOfOuputs; i++)
                 for (int j = 0; j < numberOfInputs; j++)
-                    weights[i, j] = (float)Random.NextDouble() - 0.5f;
+                    weights[i, j] = Random.NextDouble() - 0.5f;
             return weights;
         }
 
@@ -50,7 +50,7 @@ namespace NeuralNetwork_CSharp
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public float[] Forward(float[] inputs)
+        public double[] Forward(double[] inputs)
         {
             _inputs = inputs;
             for (int i = 0; i < _numberOfOutputs; i++)
@@ -58,7 +58,7 @@ namespace NeuralNetwork_CSharp
                 _outputs[i] = 0;
                 for (int j = 0; j < _numberOfInputs; j++)
                     _outputs[i] += _inputs[j] * Weights[i, j];
-                _outputs[i] = (float)Math.Tanh(_outputs[i]);
+                _outputs[i] = Math.Tanh(_outputs[i]);
             }
             return _outputs;
         }
@@ -68,16 +68,16 @@ namespace NeuralNetwork_CSharp
         /// </summary>
         /// <param name="expected"></param>
         /// <returns></returns>
-        public float[] BackPropagateOutput(float[] expected)
+        public double[] BackPropagateOutput(double[] expected)
         {
-            float[] gamma = new float[_numberOfOutputs];
+            double[] gamma = new double[_numberOfOutputs];
             for (int i = 0; i < _numberOfOutputs; i++)
             {
-                float error = _outputs[i] - expected[i];
+                double error = _outputs[i] - expected[i];
                 gamma[i] = error * _activationFunction(_outputs[i]);
                 for (int j = 0; j < _numberOfInputs; j++)
                 {
-                    float weightsDelta = gamma[i] * _inputs[j];
+                    double weightsDelta = gamma[i] * _inputs[j];
                     Weights[i, j] = UpdateWeights(Weights[i, j], weightsDelta, LEARNING_RATE);
                 }
 
@@ -91,9 +91,9 @@ namespace NeuralNetwork_CSharp
         /// <param name="gammaForward"></param>
         /// <param name="weightsForward"></param>
         /// <returns></returns>
-        public float[] BackPropagateHidden(float[] gammaForward, float[,] weightsForward)
+        public double[] BackPropagateHidden(double[] gammaForward, double[,] weightsForward)
         {
-            float[] gamma = new float[_numberOfOutputs];
+            double[] gamma = new double[_numberOfOutputs];
             for (int i = 0; i < _numberOfOutputs; i++)
             {
                 for (int j = 0; j < gammaForward.Length; j++)
@@ -101,7 +101,7 @@ namespace NeuralNetwork_CSharp
                 gamma[i] *= _activationFunction(_outputs[i]);
                 for (int j = 0; j < _numberOfInputs; j++)
                 {
-                    float weightsDelta = gamma[i] * _inputs[j];
+                    double weightsDelta = gamma[i] * _inputs[j];
                     Weights[i, j] = UpdateWeights(Weights[i, j], weightsDelta, LEARNING_RATE);
                 }
 
@@ -116,7 +116,7 @@ namespace NeuralNetwork_CSharp
         /// <param name="weightsDelta"></param>
         /// <param name="learningRate"></param>
         /// <returns></returns>
-        private float UpdateWeights(float weight, float weightsDelta, float learningRate)
+        private double UpdateWeights(double weight, double weightsDelta, double learningRate)
         {
             return weight - weightsDelta * learningRate;
         }

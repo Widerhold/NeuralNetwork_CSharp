@@ -20,9 +20,9 @@ namespace NeuralNetwork_CSharp
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public float[] Forward(float[] inputs)
+        public double[] Forward(double[] inputs)
         {
-            float[] output = _layers[0].Forward(inputs);
+            double[] output = _layers[0].Forward(inputs);
             for (int i = 1; i < _layers.Length; i++)
             {
                 output = _layers[i].Forward(output);
@@ -34,21 +34,21 @@ namespace NeuralNetwork_CSharp
         /// Calculates the error throught Backprogpagation and adjusts the weights
         /// </summary>
         /// <param name="expected"></param>
-        public void BackPropagate(float[] expected)
+        public void BackPropagate(double[] expected)
         {
-            float[] gamma = _layers[_layers.Length - 1].BackPropagateOutput(expected);
+            double[] gamma = _layers[_layers.Length - 1].BackPropagateOutput(expected);
             for (int i = _layers.Length - 2; i >= 0; i--)
                 gamma = _layers[i].BackPropagateHidden(gamma, _layers[i + 1].Weights);
         }
 
-        public static float TanhDerivation(float value)
+        public static double TanhDerivation(double value)
         {
             return 1 - (value * value);
         }
 
-        public static float Sigmoid(float value)
+        public static double Sigmoid(double value)
         {
-            return 2.0f / (1.0f + (float)Math.Exp(-2.0f * value))-1.0f;
+            return 2.0f / (1.0f + Math.Exp(-2.0f * value))-1.0f;
         }
     }
 }
